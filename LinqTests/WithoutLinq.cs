@@ -126,5 +126,99 @@ namespace LinqSample.WithoutLinq
                 }
             }
         }
+
+        public static T YourFirst<T>(IEnumerable<T> sources, Func<T, bool> func)
+        {
+            var enumerator = sources.GetEnumerator();
+            var index = 0;
+            while (enumerator.MoveNext())
+            {
+                if (index < 1 && func(enumerator.Current))
+                {
+                    return enumerator.Current;
+                }
+            }
+
+            throw new InvalidOperationException();
+        }
+
+        public static T YourLast<T>(IEnumerable<T> sources, Func<T, bool> func)
+        {
+            var last = default(T);
+            var isNotEmpty = false;
+            var enumerator = sources.GetEnumerator();
+            while (enumerator.MoveNext())
+            {
+                if (func(enumerator.Current))
+                {
+                    last = enumerator.Current;
+                    isNotEmpty = true;
+                }
+            }
+
+            if (!isNotEmpty)
+            {
+                throw new InvalidOperationException();
+            }
+
+            return last;
+        }
+
+        public static IEnumerable<int> YourGroup<T>(IEnumerable<T> sources, int countPerGroup, Func<T, int> func)
+        {
+            var result = 0;
+            var index = 0;
+            using (IEnumerator<T> enumerator = sources.GetEnumerator())
+            {
+                while (enumerator.MoveNext())
+                {
+                    if (index == 0 || index % countPerGroup != 0)
+                    {
+                        result += func(enumerator.Current);
+                    }
+                    else
+                    {
+                        yield return result;
+                        result = func(enumerator.Current);
+                    }
+                    index++;
+                }
+            }
+
+
+            yield return result;
+        }
+
+        public static bool YourAll<T>(this IEnumerable<T> sources, Func<T, bool> func)
+        {
+            using (var enumerator = sources.GetEnumerator())
+            {
+                while (enumerator.MoveNext())
+                {
+                    if (!func(enumerator.Current))
+                    {
+                        return false;
+                    }
+                }
+            }
+
+            return true;
+        }
+
+        public static bool YourAny<T>(this IEnumerable<T> sources, Func<T, bool> func)
+        {
+            using (var enumerator = sources.GetEnumerator())
+            {
+                while (enumerator.MoveNext())
+                {
+                    if (func(enumerator.Current))
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        }
     }
 }

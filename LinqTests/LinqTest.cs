@@ -185,7 +185,7 @@ namespace LinqTests
         {
             var employees = RepositoryFactory.GetEmployees();
             var actual = WithoutLinq.YourLast(employees, e => e.Age > 30);
-
+            
             var expected = new Employee
             {
                 Name = "Joey",
@@ -197,6 +197,22 @@ namespace LinqTests
 
 
             expected.ToExpectedObject().ShouldEqual(actual);
+        }
+
+        [TestMethod]
+        public void Is_All_Product_Cost_LessThan_41_Should_Return_False()
+        {
+            var products = RepositoryFactory.GetProducts();
+            var actual = products.YourAll(e => e.Cost < 41);
+            Assert.IsFalse(actual);
+        }
+
+        [TestMethod]
+        public void Is_Any_Annie_Should_Return_False()
+        {
+            var employees = RepositoryFactory.GetEmployees();
+            var actual = employees.YourAny(e => e.Name == "Annie");
+            Assert.IsFalse(actual);
         }
     }
 }
